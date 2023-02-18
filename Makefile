@@ -27,3 +27,6 @@ $(BUILDPATH):
 clean:
 	rm $(OFILES)
 	rm $(PROGNAME)
+
+tidy:
+	rm $(OFILES)

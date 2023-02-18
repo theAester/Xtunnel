@@ -169,7 +169,7 @@ void* conv_proc(void* vargs){
 
 			int packlen = decode_one_udp(rinqueue, nn->buffer, &temp);
 			
-			printf("converter yielded: %s\n", nn->buffer);
+			printf("converter yielded[%d]: %s\n", packlen, nn->buffer);
 			fflush(stdout);
 			nn->datasz = packlen;
 

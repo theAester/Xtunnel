@@ -6,17 +6,24 @@ char* progname;
 int print_usage(int type){
 	fprintf((type==1 ? stderr : stdout), 
 		 "Usage\n"
-		 "\t%s [-h] -u client_addr:client_port@server_addr:server_port[-...] -s xserver_addr:xserver_port listen_port_no"
+		 "\t%s [-h] [-l] -u client_addr:client_port@server_addr:server_port[-...] -s xserver_addr:xserver_port listen_port_no\n"
 		 "\n"
 		 "listen_port_no: the port that xclient will be listening to\n"
 		 "\n"
-		 "option description:\n"
+		 "\t-l\t:\tlisten. makes this end act as the Xserver.\n"
+		 "\t\t\tby default if this flag is not specifies, this\n"
+		 "\t\t\tend acts as Xclient.\n"
+		 "\t\t\tat the presence of this flag, xserver_addr is\n"
+		 "\t\t\tignored\n"
+		 "\n"
 		 "\t-h\t:\tdisplays this help message\n"
+		 "\n"
 		 "\t-u\t:\tclientlist. enter each entry in the specified\n"
-		 "\t\t\tformatseparated by dashes(-) do not\n"
+		 "\t\t\tformat separated by dashes(-) do not\n"
 		 "\t\t\tplace a dash at the end of the list!\n"
+		 "\n"
 		 "\t-s\t:\taddress and port of the\n"
-		 "\t\t\txserver process"
+		 "\t\t\txserver process\n\n"
 		 , progname
 	);
 	return 0;
@@ -37,7 +44,9 @@ int extract_xserver(char* str, struct sockaddr_in* xserveraddr){
 	*portstr = '\0';
 	xserveraddr->sin_family = AF_INET;
 	xserveraddr->sin_port = htons(temp);
-	if(inet_pton(AF_INET, str, &(xserveraddr->sin_addr)) == 0){
+	if(str == portstr){
+		inet_pton(AF_INET, "127.0.0.1", &(xserveraddr->sin_addr));
+	}else if(inet_pton(AF_INET, str, &(xserveraddr->sin_addr)) == 0){
 		fprintf(stderr, "xserveraddr: bad ip address %s\n", str);
 		fflush(stderr);
 		*portstr = ':';
@@ -189,7 +198,7 @@ int	parse_input(int argc, char* argv[],
 			case 'u':
 				encouteredU =1;
 				if(extract_client(optarg, clientaddr_list, list_len)){
-					fprintf(stderr, "parse error, client list is in wrong format\n");
+					fprintf(stderr, "parse error, client_list is in wrong format\n");
 					print_usage(1);
 					return 1;
 				}
@@ -197,7 +206,7 @@ int	parse_input(int argc, char* argv[],
 			case 's':
 				encouteredS =1;
 				if(extract_xserver(optarg, xserveraddr)){
-					fprintf(stderr, "parse error, xserver addr is in wrong format\n");
+					fprintf(stderr, "parse error, xserver_addr is in wrong format\n");
 					print_usage(1);
 					return 1;
 				}
